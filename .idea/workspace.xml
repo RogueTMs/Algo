@@ -95,6 +95,7 @@
       <workItem from="1693844878434" duration="48000" />
       <workItem from="1693902475884" duration="122000" />
       <workItem from="1693902689421" duration="5701000" />
+      <workItem from="1693909965068" duration="17000" />
     </task>
     <servers />
   </component>
@@ -103,6 +104,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Algo$main.coverage" NAME="main Coverage Results" MODIFIED="1693844908359" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Algo$Task32.coverage" NAME="Task32 Coverage Results" MODIFIED="1693907649351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Algo$Task32.coverage" NAME="Task32 Coverage Results" MODIFIED="1693909115619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Algo$Task33.coverage" NAME="Task33 Coverage Results" MODIFIED="1693909699177" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
