@@ -21,19 +21,18 @@ class UnionFind:
         a = self.find(x)
         b = self.find(y)
 
-        if self.rank[a] < self.rank[b]:
+        if self.rank[a] > self.rank[b]:
             a, b = b, a
 
-        self.nodes[b] = a
+        self.nodes[a] = b
 
-        if self.rank[a] == self.rank[b]:
-            self.rank[a] += 1
+        self.rank[b] = self.rank[a]
+        # print(self.nodes, self.rank)
 
 
 class Solution:
     def __init__(self, data):  # id, deadline, fine
         self.size = len(data)
-        self.res = [-1] * self.size
         self.data = sorted(data, key=lambda x: x[2], reverse=True)
 
     def naive(self):
@@ -47,31 +46,52 @@ class Solution:
         return res, total_fine
 
     def optim(self):
-        # ans = [-1] * len(self.data)
-        # uf = UnionFind(self.data)
-        # for id, deadline, fine in uf.data:
-
+        ans = [-1] * self.size
+        no_time = []
         total_fine = 0
-        for id, deadline, fine in self.data:
-            if self.res[deadline] == -1:
-                self.res[deadline] = id
+        uf = UnionFind(self.data)
+        for id, deadline, fine in uf.data:
+            if ans[deadline] == -1:
+                ans[deadline] = id
+                uf.rank[deadline] = deadline
+                if deadline - 1 != -1 and ans[deadline - 1] != -1:
+                    uf.union(deadline, deadline - 1)
+                if deadline + 1 != self.size and ans[deadline + 1] != -1:
+                    uf.union(deadline, deadline + 1)
             else:
-                deadline -= 1
-                while deadline != -1:
-                    if self.res[deadline] == -1:
-                        self.res[deadline] = id
-                        break
-                    deadline -= 1
-                if deadline == -1:
+                if uf.rank[deadline] != 0:
+                    ans[deadline - 1] = id
+                    uf.rank[deadline - 1] = deadline - 1
+                    uf.union(deadline - 1, deadline)
+                    if deadline - 2 != -1 and ans[deadline - 2] != -1:
+                        uf.union(deadline - 2, deadline - 1)
+                else:
                     total_fine += fine
-                    deadline = self.size - 1
-                    while deadline:
-                        if self.res[deadline] == -1:
-                            self.res[deadline] = id
-                            break
-                        deadline -= 1
+                    no_time.append(id)
+            # print(id, deadline, fine, ans, total_fine)
 
-        return self.res, total_fine
+        return ans[:self.size - len(no_time)] + no_time, total_fine
+
+        # for id, deadline, fine in self.data:
+        #     if self.res[deadline] == -1:
+        #         self.res[deadline] = id
+        #     else:
+        #         deadline -= 1
+        #         while deadline != -1:
+        #             if self.res[deadline] == -1:
+        #                 self.res[deadline] = id
+        #                 break
+        #             deadline -= 1
+        #         if deadline == -1:
+        #             total_fine += fine
+        #             deadline = self.size - 1
+        #             while deadline:
+        #                 if self.res[deadline] == -1:
+        #                     self.res[deadline] = id
+        #                     break
+        #                 deadline -= 1
+        #
+        # return self.res, total_fine
 
 
 test = [[0, 2, 25], [1, 3, 10], [2, 0, 30], [3, 2, 50], [4, 2, 20]]
