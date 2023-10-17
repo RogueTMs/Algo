@@ -27,7 +27,6 @@ class UnionFind:
         self.nodes[a] = b
 
         self.rank[b] = self.rank[a]
-        # print(self.nodes, self.rank)
 
 
 class Solution:
@@ -94,8 +93,11 @@ class Solution:
         # return self.res, total_fine
 
 
-test = [[0, 2, 25], [1, 3, 10], [2, 0, 30], [3, 2, 50], [4, 2, 20]]
+test1 = [[0, 2, 25], [1, 3, 10], [2, 0, 30], [3, 2, 50], [4, 2, 20]]
+test2 = [[0, 3, 80], [1, 3, 100], [2, 1, 90], [3, 0, 95], [4, 2, 40]]
+test3 = [[0, 1, 40], [1, 1, 70], [2, 1, 60], [3, 0, 30], [4, 3, 55]]
 
-sol = Solution(test)
+
+sol = Solution(test1)
 
 print(sol.naive(), sol.optim())

@@ -12,7 +12,6 @@ class Solution:
             if nums[i] + i >= ret:
                 ret = nums[i] + i
                 save_pos = i
-        print(save_pos, ret)
         if ret == 0:
             return False
 
@@ -21,7 +20,5 @@ class Solution:
 
 # nums = [1, 1, 2, 2, 0, 1, 1]
 sol = Solution()
-nums = [4,2,5,0,1,0,4,4,4,0,4,0]
+nums = [4, 2, 5, 0, 1, 0, 4, 4, 4, 0, 4, 0]
 print(sol.canJump(nums))
-
-
