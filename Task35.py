@@ -36,68 +36,35 @@ class Solution:
 
     def naive(self):
         total_fine = 0
-        res = [-1] * len(self.data)
-        for day in range(len(self.data)):
-            res[day] = self.data[day][0]
-            if day > self.data[day][1]:
-                total_fine += self.data[day][2]
-
+        res = [-1] * self.size
+        for i in range(self.size):
+            task = self.data[i]
+            res[i] = task[0]
+            if i < task[1]:
+                total_fine += task[2]
         return res, total_fine
 
     def optim(self):
-        ans = [-1] * self.size
-        no_time = []
+        union_find = UnionFind(self.data)
+        res = [-1] * self.size
         total_fine = 0
-        uf = UnionFind(self.data)
-        for id, deadline, fine in uf.data:
-            if ans[deadline] == -1:
-                ans[deadline] = id
-                uf.rank[deadline] = deadline
-                if deadline - 1 != -1 and ans[deadline - 1] != -1:
-                    uf.union(deadline, deadline - 1)
-                if deadline + 1 != self.size and ans[deadline + 1] != -1:
-                    uf.union(deadline, deadline + 1)
-            else:
-                if uf.rank[deadline] != 0:
-                    ans[deadline - 1] = id
-                    uf.rank[deadline - 1] = deadline - 1
-                    uf.union(deadline - 1, deadline)
-                    if deadline - 2 != -1 and ans[deadline - 2] != -1:
-                        uf.union(deadline - 2, deadline - 1)
-                else:
-                    total_fine += fine
-                    no_time.append(id)
-            # print(id, deadline, fine, ans, total_fine)
 
-        return ans[:self.size - len(no_time)] + no_time, total_fine
+        for task in self.data:
+            index = union_find.find(task[1] - 1)
+            union_find.union(index, index - 1)
+            res[index] = task[0]
+            if index > task[1]:
+                total_fine += task[2]
 
-        # for id, deadline, fine in self.data:
-        #     if self.res[deadline] == -1:
-        #         self.res[deadline] = id
-        #     else:
-        #         deadline -= 1
-        #         while deadline != -1:
-        #             if self.res[deadline] == -1:
-        #                 self.res[deadline] = id
-        #                 break
-        #             deadline -= 1
-        #         if deadline == -1:
-        #             total_fine += fine
-        #             deadline = self.size - 1
-        #             while deadline:
-        #                 if self.res[deadline] == -1:
-        #                     self.res[deadline] = id
-        #                     break
-        #                 deadline -= 1
-        #
-        # return self.res, total_fine
+        return res, total_fine
 
 
-test1 = [[0, 2, 25], [1, 3, 10], [2, 0, 30], [3, 2, 50], [4, 2, 20]]
-test2 = [[0, 3, 80], [1, 3, 100], [2, 1, 90], [3, 0, 95], [4, 2, 40]]
-test3 = [[0, 1, 40], [1, 1, 70], [2, 1, 60], [3, 0, 30], [4, 3, 55]]
+# id, deadline, fine
+test1 = [['A', 3, 25], ['B', 4, 10], ['C', 1, 30], ['D', 3, 50], ['E', 3, 20]]
+test2 = [[0, 4, 80], [1, 4, 100], [2, 2, 90], [3, 1, 95], [4, 3, 40]]
+test3 = [[0, 2, 40], [1, 2, 70], [2, 2, 60], [3, 1, 30], [4, 4, 55]]
 
-
-sol = Solution(test1)
-
-print(sol.naive(), sol.optim())
+tests = [test1, test2, test3]
+for test in tests:
+    sol = Solution(test)
+    print(sol.naive(), sol.optim())
