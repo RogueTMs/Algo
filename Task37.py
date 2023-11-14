@@ -1,20 +1,20 @@
+from typing import List
+
+
 class Solution:
     def calculateMinimumHP(self, dungeon: List[List[int]]) -> int:
-        
-        rows, columns = len(dungeon), len(dungeon[0])
-        hp = [[0]*columns for i in range(rows)]
-        
-        hp[-1][-1] = max(1, 1-dungeon[-1][-1])
-        for i in range(rows-2, -1,-1):
-            hp[i][-1] = max(1, 
-                            hp[i+1][-1] - dungeon[i][-1])  
-        for j in range(columns-2, -1, -1): 
-            hp[-1][j] = max(1, 
-                            hp[-1][j + 1] - dungeon[-1][j])
-        
-        
-        for i in range(rows-2, -1, -1):
-            for j in range(columns-2, -1, -1):                
-                hp[i][j] = max(1, min(hp[i+1][j], hp[i][j+1]) - dungeon[i][j])
-        
-        return hp[0][0]
+
+        rows, columns = len(dungeon) - 1, len(dungeon[0]) - 1
+
+        dungeon[columns][rows] = max(1, 1 - dungeon[columns][rows])
+        for r in range(rows - 1, -1, -1):
+            dungeon[r][columns] = max(1, dungeon[r + 1][columns] - dungeon[r][columns])
+
+        for c in range(columns - 1, -1, -1):
+            dungeon[-1][c] = max(1, dungeon[columns][c + 1] - dungeon[columns][c])
+
+        for r in range(rows - 1, -1, -1):
+            for c in range(columns - 1, -1, -1):
+                dungeon[r][c] = max(1, min(dungeon[r + 1][c], dungeon[r][c + 1]) - dungeon[r][c])
+
+        return dungeon[0][0]
