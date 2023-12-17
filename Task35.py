@@ -1,38 +1,39 @@
-from collections import namedtuple
-from timeit import default_timer as timer
-from datetime import timedelta
+"""
+LeetCode: None
+Task: построить максимальное (и самое дорогое) выполнимое множество задач
+Input: [[id, deadline, fine], ...]
+Output: Tasks sequence, total fine
+"""
 
 
 class UnionFind:
     def __init__(self, data):
-        self.size = len(data)
-        self.nodes = [x for x in range(self.size)]
-        self.rank = [0] * self.size
-        self.data = data
+        size = len(data)
+        self.nodes = [x for x in range(size)]  # 0, ... , size-1
+        self.rank = [0] * size
 
-    def find(self, x):
+    def find(self, x):  # -> класс эквивалентности
         if self.nodes[x] != x:
             self.nodes[x] = self.find(self.nodes[x])
             return self.nodes[x]
         else:
             return x
 
-    def union(self, x, y):
+    def union(self, x, y):  # объединяет два класса эквивалентности
         a = self.find(x)
         b = self.find(y)
-
-        if self.rank[a] > self.rank[b]:
+        if self.rank[a] < self.rank[b]:
             a, b = b, a
 
         self.nodes[a] = b
-
-        self.rank[b] = self.rank[a]
+        if self.rank[b] == self.rank[a]:
+            self.rank[b] += 1
 
 
 class Solution:
     def __init__(self, data):  # id, deadline, fine
         self.size = len(data)
-        self.data = sorted(data, key=lambda x: x[2], reverse=True)
+        self.data = sorted(data, key=lambda x: x[2], reverse=True)  # sorted by fine
 
     def naive(self):
         total_fine = 0
@@ -50,19 +51,19 @@ class Solution:
         total_fine = 0
 
         for task in self.data:
-            index = union_find.find(task[1] - 1)
-            union_find.union(index, index - 1)
-            res[index] = task[0]
-            if index > task[1]:
+            equivalence_class = union_find.find(task[1])
+            union_find.union(equivalence_class, equivalence_class - 1)
+            res[equivalence_class] = task[0]
+            if equivalence_class > task[1]:
                 total_fine += task[2]
 
         return res, total_fine
 
 
 # id, deadline, fine
-test1 = [['A', 3, 25], ['B', 4, 10], ['C', 1, 30], ['D', 3, 50], ['E', 3, 20]]
-test2 = [[0, 4, 80], [1, 4, 100], [2, 2, 90], [3, 1, 95], [4, 3, 40]]
-test3 = [[0, 2, 40], [1, 2, 70], [2, 2, 60], [3, 1, 30], [4, 4, 55]]
+test1 = [['A', 2, 25], ['B', 3, 10], ['C', 0, 30], ['D', 2, 50], ['E', 2, 20]]
+test2 = [[0, 3, 80], [1, 3, 100], [2, 1, 90], [3, 0, 95], [4, 2, 40]]
+test3 = [[0, 1, 40], [1, 1, 70], [2, 1, 60], [3, 0, 30], [4, 3, 55]]
 
 tests = [test1, test2, test3]
 for test in tests:
