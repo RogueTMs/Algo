@@ -6,7 +6,7 @@ from itertools import cycle
 random_cycle = cycle([random.randint(1, 100) for _ in range(1000)])
 
 
-class Treap(object):
+class Treap:
     def __init__(self, val):
         self.root = None
         self.priority = random.random()
