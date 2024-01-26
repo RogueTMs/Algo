@@ -1,72 +1,105 @@
-from __future__ import annotations
-
 import random
-from itertools import cycle
-
-random_cycle = cycle([random.randint(1, 100) for _ in range(1000)])
 
 
-class Treap:
-    def __init__(self, val):
-        self.root = None
+class Node:
+    def __init__(self, value):
+        self.value = value
         self.priority = random.random()
         self.size = 1
-        self.val = val
-        self.sum = 0
         self.left = None
         self.right = None
 
-    @staticmethod
-    def _splitBySize(T: Treap, k) -> (Treap, Treap):
-        if not T: return None, None
 
-        if k <= T.root.left.size:
-            LL, LR = Treap._splitBySize(T.left, k)
-            T.left = LR
-            T._update(T)
-            return LL, T
-        else:
-            RL, RR = Treap._splitBySize(T.right, k - T.left.size - 1)
-            T.right = RL
-            T._update(T)
-            return T, RR
+class ImplicitTreap:
+    def __init__(self):
+        self.root = None
 
-    @staticmethod
-    def _update(T: Treap):
-        T.root.size = 1 + T.left.size + T.right.size
+    def build(self, array):
+        for i in range(len(array)):
+            self.insert(i, array[i])
 
-    @staticmethod
-    def _merge(T1, T2: Treap) -> Treap:
-        if not T1: return T2
+    def sum(self, _from, _to):
+        left, mid = self._split_by_size(self.root, _from - 1)
+        mid, right = self._split_by_size(mid, _to - _from)
+        total_sum = self._get_sum(mid)
+        self.root = self._merge(left, self._merge(mid, right))
+        return total_sum
 
-        if not T2: return T1
-        if T1.root.p < T2.root.p:
-            T1.right = Treap._merge(T1.right, T2)
-            return T1
-        else:
-            T2.left = Treap._merge(T1, T2.left)
-            return T2
-
-    def insert(self, val, pos):
-        L, R = self._splitBySize(self, pos - 1)
-        T = Treap(val)
-        return Treap._merge(Treap._merge(L, T), R)
+    def insert(self, pos, value):
+        left, right = self._split_by_size(self.root, pos - 1)
+        new_node = Node(value)
+        self.root = self._merge(self._merge(left, new_node), right)
 
     def erase(self, pos):
-        L, R = Treap._splitBySize(self, pos - 1)
-        E, RR = Treap._splitBySize(R, 1)
-        Treap._merge(L, RR)
+        left, right = self._split_by_size(self.root, pos)
+        e, r = self._split_by_size(right, 1)
+        self._merge(left, r)
 
-    def sum(self, _from, to):
-        L, R = self._splitBySize(self, _from - 1)
-        RL, RR = self._splitBySize(R, to - _from + 1)
-        return RL.sum
+    def erase_region(self, pos, count):
+        left, right = self._split_by_size(self.root, pos - 1)
+        e, r = self._split_by_size(right, count)
+        self._merge(left, r)
+
+    def _merge(self, left, right):
+        if not left or not right:
+            return left if not right else right
+
+        if left.priority > right.priority:
+            left.right = self._merge(left.right, right)
+            _update_size(left)
+            return left
+        else:
+            right.left = self._merge(left, right.left)
+            _update_size(right)
+            return right
+
+    def _split_by_size(self, node, index):
+        if not node:
+            return None, None
+
+        if index <= _size(node.left):
+            left, right = self._split_by_size(node.left, index)
+            node.left = right
+            _update_size(node)
+            return left, node
+        else:
+            left, right = self._split_by_size(node.right, index - _size(node.left) - 1)
+            node.right = left
+            _update_size(node)
+            return node, right
+
+    def _get_sum(self, node):
+        return node.value + self._get_sum(node.left) + self._get_sum(node.right) if node else 0
 
 
-a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-t = build(a, 0, len(a))
-t = insert(t, 0, 5)
-t = erase(t, 0)
-t = erase(t, 0, 3)
-all_sum = sum(t, 0, 6)
-print(all_sum)
+def _size(node):
+    return node.size if node else 0
+
+
+def _update_size(node):
+    if node:
+        node.size = _size(node.left) + _size(node.right) + 1
+
+
+# tests
+
+treap = ImplicitTreap()
+
+initial_array = [1, 2, 3, 4, 5]
+treap.build(initial_array)
+print(initial_array)
+
+from_idx, to_idx = 2, 4
+sum_result = treap.sum(from_idx, to_idx)
+print(sum_result)
+
+new_value = 6
+insert_index = 1
+treap.insert(insert_index, new_value)
+print(treap.sum(1, len(initial_array) - 1))
+
+treap.erase(insert_index)
+print(treap.sum(1, len(initial_array) - 1))
+
+treap.erase_region(1, 2)
+print(treap.sum(1, len(initial_array) - 1))

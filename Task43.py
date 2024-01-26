@@ -1,75 +1,50 @@
-class SegmentTree:
-    def __init__(self, nums):
-        self.n = len(nums)
-        self.tree = [0] * 4 * self.n
-        self.buildTree(nums, 0, self.n - 1, 1)
+from typing import List
 
-    def buildTree(self, nums, left, right, index):
-        if left == right:
-            self.tree[index] = nums[left]
-            return
 
-        mid = (left + right) >> 1
-
-        self.buildTree(nums, left, mid, 2 * index)
-        self.buildTree(nums, mid + 1, right, 2 * index + 1)
-
-        # self.tree[index] = self.tree[2 * index] + self.tree[2 * index + 1]
-        self.merge(nums, 2 * index, 2 * index + 1)
-
-    def getSum(self, v, tl, tr, l, r: int) -> int:
-        if l == tl and r == tr:
-            return self.tree[v]
-
-        tm = (tl + tr) >> 1
-        res = 0
-        if l <= tm:
-            res += self.getSum(v * 2, tl, tm, l, min(r, tm))
-        if r >= tm + 1:
-            res += self.getSum(v * 2 + 1, tm + 1, tr, max(l, tm + 1), r)
-        return res
-
-    def update(self, left, right, index, pos, val):
-        if left == right:
-            self.tree[index] = val
-            return
-
-        mid = (left + right) >> 1
-        if pos <= mid:
-            self.update(left, mid, 2 * index, pos, val)
-        else:
-            self.update(mid + 1, right, 2 * index + 1, pos, val)
-
-        self.tree[index] = self.tree[2 * index] + self.tree[2 * index + 1]
-
-    def merge(self, nums, left, right):
-        mid = (left + right) >> 1
-        l = left
-        r = mid + 1
-        temp = []
-        while l <= mid and r <= right:
-            if nums[l][0] > nums[r][0]:
-                temp.append(nums[l])
-                self.tree[nums[l][1]] += (right - r + 1)
-                l += 1
-            else:
-
-                temp.append(nums[r])
-                r += 1
-
-        while l <= mid:
-            temp.append(nums[l])
-            l += 1
-
-        while r <= right:
-            temp.append(nums[r])
-            r += 1
-
-        for i in range(left, right + 1):
-            nums[i] = temp[i - left]
-
+class SegmentTreeNode:
+    def __init__(self, low, high):
+        self.low = low
+        self.high = high
+        self.left = None
+        self.right = None
+        self.counter = 0
 
 
 class Solution:
-    def countSmaller(self, nums: List[int]) -> List[int]:
+    def _build(self, left, right):
+        root = SegmentTreeNode(self.nums[left], self.nums[right])
+        if left == right:
+            return root
 
+        mid = (left + right) // 2
+        root.left = self._build(left, mid)
+        root.right = self._build(mid + 1, right)
+        return root
+
+    def _update(self, root, val):
+        if not root:
+            return
+        if root.low <= val <= root.high:
+            root.counter += 1
+            self._update(root.left, val)
+            self._update(root.right, val)
+
+    def _query(self, root, lower, upper):
+        if lower <= root.low and root.high <= upper:
+            return root.counter
+        if upper < root.low or root.high < lower:
+            return 0
+        return self._query(root.left, lower, upper) + self._query(
+            root.right, lower, upper
+        )
+
+    def countSmaller(self, nums: List[int]) -> List[int]:
+        nums = nums[::-1]
+        self.nums = sorted(list(set(nums)))
+        root = self._build(0, len(self.nums) - 1) if nums else None
+
+        res = []
+        for n in nums:
+            res.append(self._query(root, float("-inf"), n - 1))
+            self._update(root, n)
+        return res[::-1]
